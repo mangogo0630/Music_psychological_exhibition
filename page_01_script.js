@@ -138,6 +138,28 @@ function initScrollEffects() {
     initFloatingButton("#floating-button-1", "bottom 50%", -10, 1.5);
     initFloatingButton("#floating-button-2", "bottom 25%", -8, 1.8);
     initFloatingButton("#floating-button-3", "bottom 30%", -7, 1.0);
+
+    // 若在最上面，按鈕全部隱藏（避免初始或回頂時露出）
+    ScrollTrigger.create({
+        trigger: ".wrapper",
+        start: "top top",
+        end: "+=100%",
+        onUpdate: (self) => {
+            const shouldShow = self.progress > 0.02 && !isLastImage;
+            const buttons = document.querySelectorAll(".floating-button");
+            buttons.forEach(btn => {
+                if (shouldShow) {
+                    // 顯示但不搶動畫控制
+                    if (getComputedStyle(btn).display === 'none') {
+                        btn.style.display = 'block';
+                    }
+                } else {
+                    btn.style.opacity = '0';
+                    btn.style.display = 'none';
+                }
+            });
+        }
+    });
 }
 
 // 滾動處理函數
