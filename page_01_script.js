@@ -9,6 +9,7 @@ const imgElement = document.getElementById("switchImage");
 let isPlaying = false;
 let isLastImage = false;
 const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+let scrollProgress = 0; // 全局變量追蹤滾動進度
 
 // 當 DOM 加載完成後初始化
 window.addEventListener("DOMContentLoaded", () => {
@@ -140,26 +141,54 @@ function initScrollEffects() {
     initFloatingButton("#floating-button-3", "bottom 30%", -7, 1.0);
 
     // 若在最上面，按鈕全部隱藏（避免初始或回頂時露出）
-    ScrollTrigger.create({
+    const scrollProgressTrigger = ScrollTrigger.create({
         trigger: ".wrapper",
         start: "top top",
         end: "+=100%",
         onUpdate: (self) => {
-            const shouldShow = self.progress > 0.02 && !isLastImage;
+            scrollProgress = self.progress;
+            // 頂端時（progress <= 0.05）強制隱藏所有按鈕
+            // 非頂端時，如果 isLastImage 為 false，需要 progress > 0.05 才顯示
+            // 如果 isLastImage 為 true，可以顯示（但頂端時仍隱藏）
+            const isAtTop = self.progress <= 0.05;
+            const shouldShow = !isAtTop && (isLastImage || self.progress > 0.05);
+            
             const buttons = document.querySelectorAll(".floating-button");
             buttons.forEach(btn => {
                 if (shouldShow) {
                     // 顯示但不搶動畫控制
                     if (getComputedStyle(btn).display === 'none') {
                         btn.style.display = 'block';
+                        btn.style.visibility = 'visible';
                     }
                 } else {
+                    // 強制隱藏：頂端時必須隱藏
                     btn.style.opacity = '0';
                     btn.style.display = 'none';
+                    btn.style.visibility = 'hidden';
                 }
             });
         }
     });
+
+    // 當 isLastImage 為 true 後，監聽實際滾動位置（因為此時滾動已解鎖）
+    const checkScrollPosition = () => {
+        if (isLastImage) {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const isAtTop = scrollTop <= 10; // 允許 10px 的誤差
+            
+            if (isAtTop) {
+                const buttons = document.querySelectorAll(".floating-button");
+                buttons.forEach(btn => {
+                    btn.style.opacity = '0';
+                    btn.style.display = 'none';
+                    btn.style.visibility = 'hidden';
+                });
+            }
+        }
+    };
+    
+    window.addEventListener('scroll', checkScrollPosition, { passive: true });
 }
 
 // 滾動處理函數
@@ -178,7 +207,7 @@ function handleScroll(e) {
             hint.style.backgroundColor = 'rgba(0,0,0,0.7)';
             hint.style.borderRadius = '5px';
             hint.style.zIndex = '1000';
-            hint.textContent = isTouchDevice ? '用手指向下滑，嘗試擊碎鏡子' : '滾動滑鼠，嘗試擊碎鏡子';
+            hint.textContent = isTouchDevice ? '點擊畫面，嘗試擊碎鏡子' : '點擊畫面，嘗試擊碎鏡子';
             document.body.appendChild(hint);
             
             setTimeout(() => {
@@ -195,12 +224,26 @@ function initFloatingButton(buttonId, startPosition, yOffset, duration) {
         start: startPosition,
         endTrigger: ".new-background",
         onEnter: () => {
-            gsap.to(buttonId, { opacity: 1, duration: 1, display: "block" });
+            // 只有在滾動進度足夠時才顯示按鈕
+            if (scrollProgress > 0.05 && !isLastImage) {
+                gsap.to(buttonId, { opacity: 1, duration: 1, display: "block", visibility: "visible" });
+            }
         },
         onLeaveBack: () => {
             // 完成後（最後一張圖出現）不再隱藏，避免手機回彈把選項藏起來
-            if (!isLastImage) {
-                gsap.to(buttonId, { opacity: 0, duration: 1 });
+            // 頂端時強制隱藏
+            if (!isLastImage || scrollProgress <= 0.05) {
+                gsap.to(buttonId, { 
+                    opacity: 0, 
+                    duration: 1,
+                    onComplete: () => {
+                        const btn = document.querySelector(buttonId);
+                        if (btn) {
+                            btn.style.display = 'none';
+                            btn.style.visibility = 'hidden';
+                        }
+                    }
+                });
             }
         }
     });
