@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>心理測驗</title>
+    <link rel="stylesheet" href="page_01_style.css">
+</head>
+<body>
+    <audio id="background-music" loop>
+        <source src="music/music.mp3" type="audio/mp3">
+    </audio>
+    <button id="music-control" style="display: none;"></button>
+
+    <div class="wrapper">
+        <div class="content">
+            <div class="section hero">
+            </div>
+        </div>
+
+        <div class="image-container">
+            <img src="images/鏡子示意圖-2_2.jpg" id="switchImage" class="foreground-image">
+        </div>
+
+        <div class="button-container">
+            <button id="floating-button-1" class="floating-button" onclick="handleButtonClick(this)"></button>
+            <button id="floating-button-2" class="floating-button" onclick="handleButtonClick(this)"></button>
+            <button id="floating-button-3" class="floating-button" onclick="handleButtonClick(this)"></button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="page_01_script.js"></script>
+</body>
+</html>

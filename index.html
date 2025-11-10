@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+   <title>論文寫作測驗</title>
+   <script src="preload-manager.js"></script>
+   <style>
+       body {
+           margin: 0;
+           padding: 0;
+           height: 100vh;
+           display: flex;
+           justify-content: center;
+           align-items: center;
+           background: url('images/開頭_bg.jpg') no-repeat center center;
+           background-size: cover;
+           font-family: Arial, sans-serif;
+       }
+
+       .container {
+           position: relative;
+           width: 100%;
+           height: 100%;
+           display: flex;
+           flex-direction: column;
+           justify-content: center;
+           align-items: center;
+       }
+
+       .name-input-wrapper {
+           position: relative;
+           margin: 20px 0;
+       }
+
+       .name-input-bg {
+           width: 300px;
+           height: auto;
+       }
+
+       .name-input {
+           position: absolute;
+           top: 50%;
+           left: 50%;
+           transform: translate(-50%, -50%);
+           width: 80%;
+           padding: 10px;
+           background: transparent;
+           border: none;
+           font-size: 18px;
+           text-align: center;
+           color: #333;
+       }
+
+       .name-input::placeholder {
+           color: #333;
+           opacity: 1;
+       }
+
+       .name-input:focus {
+           outline: none;
+       }
+
+       .start-btn {
+           position: absolute;
+           right: -60px;
+           bottom: -20px;
+           background: url('images/go按鈕_name.png') no-repeat center center;
+           background-size: contain;
+           width: 200px;
+           height: 60px;
+           border: none;
+           cursor: pointer;
+           transition: transform 0.2s;
+       }
+
+       .start-btn:hover {
+           transform: scale(1.05);
+       }
+
+       #music-control {
+           position: absolute;
+           right: -40px;
+           bottom: -95px;
+           width: 100px;
+           height: 80px;
+           border: none;
+           cursor: pointer;
+           background: url('images/聲音icon.png') no-repeat center center;
+           background-size: contain;
+       }
+
+       .fade-overlay {
+           position: fixed;
+           top: 0;
+           left: 0;
+           width: 100%;
+           height: 100%;
+           background-color: black;
+           opacity: 0;
+           visibility: hidden;
+           transition: opacity 1s ease;
+           z-index: 1000;
+       }
+
+       .fade-overlay.active {
+           opacity: 1;
+           visibility: visible;
+       }
+
+       /* 行動裝置優化 */
+       @media screen and (max-width: 768px) {
+           .name-input-bg {
+               width: 80vw;
+               max-width: 340px;
+           }
+
+           .name-input {
+               font-size: 16px;
+           }
+
+           .start-btn {
+               left: 50%;
+               right: auto;
+               width: 56vw;
+               max-width: 220px;
+               height: 56px;
+           }
+
+
+           #music-control {
+               left: 80%;
+               right: auto;
+               bottom: -60%;
+               width: 64px;
+               height: 64px;
+           }
+       }
+
+              /* 行動裝置優化 */
+              @media screen and (max-width: 360px) {
+           .name-input-bg {
+               width: 80vw;
+               max-width: 340px;
+           }
+
+           .name-input {
+               font-size: 16px;
+           }
+
+           .start-btn {
+               left: 50%;
+               right: auto;
+               width: 56vw;
+               height: 45px;
+           }
+
+
+           #music-control {
+               left: 80%;
+               right: auto;
+               bottom: -80%;
+               width: 64px;
+               height: 64px;
+           }
+       }
+   </style>
+</head>
+<body>
+    <div class="fade-overlay"></div>
+    
+    <div class="container">
+        <div class="name-input-wrapper">
+            <img src="images/輸入名字.png" class="name-input-bg" alt="輸入框背景">
+            <input type="text" id="userName" class="name-input" placeholder="您的名字">
+            <button onclick="startTest()" class="start-btn"></button>
+            <button id="music-control"></button>
+        </div>
+    </div>
+
+    <audio id="background-music" loop>
+        <source src="music/music.mp3" type="audio/mp3">
+    </audio>
+
+    <script>
+        // 只保留測驗相關的邏輯
+        function startTest() {
+            localStorage.clear();  // 清空所有 localStorage
+            const userName = document.getElementById('userName').value;
+            if(userName.trim() === '') {
+                alert('請輸入您的名字');
+                return;
+            }
+
+            
+            // 初始化測驗數據
+            localStorage.setItem('userName', userName);
+            localStorage.setItem('testScore', '0');
+            
+            // 執行淡出動畫
+            document.querySelector('.fade-overlay').classList.add('active');
+            
+            // 切換頁面
+            setTimeout(() => {
+                window.location.href = 'page_00.html';
+            }, 2000);
+        }
+    </script>
+    
+    <!-- 引入音樂控制器 -->
+    <script src="music-controller.js"></script>
+</html>

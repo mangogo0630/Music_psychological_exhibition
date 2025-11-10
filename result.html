@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@900&display=swap">
+    <title>論文寫作測驗結果</title>
+    <script src="preload-manager.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <style>
+        /* CSS Reset */
+        html, body, div, span, applet, object, iframe,
+        h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+        a, abbr, acronym, address, big, cite, code,
+        del, dfn, em, img, ins, kbd, q, s, samp,
+        small, strike, strong, sub, sup, tt, var,
+        b, u, i, center,
+        dl, dt, dd, ol, ul, li,
+        fieldset, form, label, legend,
+        table, caption, tbody, tfoot, thead, tr, th, td,
+        article, aside, canvas, details, embed, 
+        figure, figcaption, footer, header, hgroup, 
+        menu, nav, output, ruby, section, summary,
+        time, mark, audio, video {
+            margin: 0;
+            padding: 0;
+            border: 0;
+            font-size: 100%;
+            font: inherit;
+            vertical-align: baseline;
+        }
+        
+        /* HTML5 display-role reset for older browsers */
+        article, aside, details, figcaption, figure, 
+        footer, header, hgroup, menu, nav, section {
+            display: block;
+        }
+        
+        body {
+            line-height: 1;
+        }
+        
+        ol, ul {
+            list-style: none;
+        }
+        
+        blockquote, q {
+            quotes: none;
+        }
+        
+        blockquote:before, blockquote:after,
+        q:before, q:after {
+            content: '';
+            content: none;
+        }
+        
+        table {
+            border-collapse: collapse;
+            border-spacing: 0;
+        }
+
+        /* 主要樣式 */
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: 'Noto Serif TC', Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            background-color: #000000;
+            overflow-x: hidden;
+        }
+
+        .home-btn {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(155px);
+            cursor: pointer;
+            width: 60px;
+            height: 60px;
+            background: url('images/首頁.png') no-repeat center center;
+            background-size: contain;
+            border: none;
+            z-index: 1000;
+        }
+
+        .result-container {
+            width: 100%;
+            max-width: 390px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background-image: url('images/星空背景.jpg');
+            background-size: cover;
+            background-position: center;
+            margin: 0 auto;
+        }
+
+        .result-image {
+            width: 80%;
+            max-width: 300px;
+            height: auto;
+            display: block;
+            margin: 20px auto;
+        }
+
+        .user-name {
+            font-size: 1.5rem;
+            color: #ffffff;
+            font-weight: 900;
+            margin: 0px 0 20px 0;
+            text-align: center;
+            width: 100%;
+            padding: 0 20px;
+        }
+
+        .result-content {
+            text-align: center;
+            color: #ffffff;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .result-content h3 {
+            font-size: 1.25rem;
+            margin-bottom: 20px;
+        }
+
+        .result-content p {
+            line-height: 1.8;
+            font-size: 1rem;
+            margin: 0 auto;
+            max-width: 300px;
+        }
+
+        .button-container {
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 4px;
+        }
+
+        .download-image-btn,
+        .download-music-btn {
+            cursor: pointer;
+            border: none;
+            padding: 0;
+            margin: 0;
+            background: transparent;
+            outline: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            height: 70px;
+        }
+
+        .download-image-btn img,
+        .download-music-btn img {
+            height: 100%;
+            width: auto;
+        }
+
+        @media screen and (min-width: 391px) {
+            .result-container {
+                margin-top: 0;
+                border-left: 1px solid rgba(255, 255, 255, 0.1);
+                border-right: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            
+            body::before,
+            body::after {
+                content: '';
+                position: fixed;
+                top: 0;
+                bottom: 0;
+                width: calc((100% - 390px) / 2);
+                background-color: #000000;
+                z-index: -1;
+            }
+            
+            body::before {
+                left: 0;
+            }
+            
+            body::after {
+                right: 0;
+            }
+        }
+
+        .result-title {
+            color: #ffffff;
+            font-size: 2rem;
+            font-weight: 900;
+            text-align: center;
+            margin: 20px 0 0 0;
+            width: 100%;
+        }
+
+        .music-control-btn {
+            position: fixed;
+            top: 70px;
+            left: 50%;
+            transform: translateX(155px);
+            width: 60px;
+            height: 60px;
+            cursor: pointer;
+            background: url('images/靜音icon.png') no-repeat center center;
+            background-size: contain;
+            border: none;
+            z-index: 1000;
+        }
+
+        @media screen and (min-width: 391px) {
+            .music-control-btn {
+                transform: translateX(155px);
+            }
+        }
+
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1001;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .loading-overlay.show {
+            display: flex;
+        }
+
+        .loading-progress {
+            color: white;
+            font-size: 1rem;
+            margin-top: 10px;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        .loading-text {
+            color: white;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        #confirmBtn {
+    width: 80px;
+    height: 80px;
+    background-image: url('images/確定按鈕.png');
+    transition: opacity 0.3s ease; /* 加入漸變效果 */
+}
+.error-message {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #f44336;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    z-index: 9999;
+}
+    </style>
+</head>
+<body>
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">正在處理中，請稍候...</div>
+        <div id="progressText" class="loading-progress">0%</div>
+    </div>
+
+    <audio id="background-music" loop>
+        <source type="audio/mpeg">
+    </audio>
+    <button onclick="goHome()" class="home-btn"></button>
+    <button id="music-control" class="music-control-btn"></button>
+
+    <div id="captureArea" class="result-container">
+        <h3 class="result-title">測驗結果</h3>
+        <img id="resultImage" class="result-image" alt="結果圖片">
+        <div class="user-name" id="userNameDisplay"></div>
+        <div class="result-content"></div>
+    </div>
+
+    <div class="button-container">
+        <button onclick="captureAndDownload()" class="download-image-btn">
+            <img src="images/下載圖片.png" alt="下載圖片">
+        </button>
+        <button onclick="createAndDownloadVideo()" class="download-music-btn">
+            <img src="images/領取專屬音樂.png" alt="領取專屬音樂">
+        </button>
+    </div>
+
+        <script>
+        let userResult;  // 將userResult移到更高的作用域
+let isMuted = false; // 新增一個變數來追蹤靜音狀態
+
+document.addEventListener('DOMContentLoaded', function() {
+    const userName = localStorage.getItem('userName') || '訪客';
+    const testScore = parseInt(localStorage.getItem('testScore')) || 0;
+    const answerType = localStorage.getItem('answerType');
+    
+    // Debug info
+    console.log('Current score:', testScore);
+    console.log('Answer type:', answerType);
+    
+    const results = [
+        {
+            minScore: 5,
+            maxScore: 7,
+            answerType: 'pessimistic',
+            type: "消極型研究生",
+            image: 'images/消極.png',
+            music: 'music/消極型.mp3',
+            musicImage: 'images/mresult消極型.png',
+            description: "你在論文寫作過程中似乎承受著較大的壓力。建議你可以尋求指導教授或同學的協助，適當調整心態和作息，相信透過適當的調適，你一定能順利完成論文！"
+        },
+        {
+            minScore: 8,
+            maxScore: 11,
+            answerType: 'moderate',
+            type: "佛系型研究生",
+            image: 'images/佛系.png',
+            music: 'music/佛系型.mp3',
+            musicImage: 'images/mresult佛系型.png',
+            description: "你對論文寫作過程中保持著平穩的步調，雖然偶有壓力但仍能保持前進。繼續保持這樣的態度，同時也要記得給自己適當的休息和獎勵。"
+        },
+        {
+            minScore: 12,
+            maxScore: 15,
+            answerType: 'optimistic',
+            type: "樂觀型研究生",
+            image: 'images/樂觀.png',
+            music: 'music/樂觀型.mp3',
+            musicImage: 'images/mresult樂觀型.png',
+            description: "你在論文寫作過程中展現出很好的心態和執行力！你善於將壓力轉化為動力，也能夠有效管理時間。維持這份熱忱，相信你的論文之路會走得很順利。"
+        }
+    ];
+
+    // 根據分數和答題類型取得結果
+    function getResult(score, type) {
+        // 優先使用 answerType 判定
+        if (type) {
+            const resultByType = results.find(result => result.answerType === type);
+            if (resultByType) return resultByType;
+        }
+        
+        // 如果沒有 answerType 或找不到對應結果，則使用分數判定
+        return results.find(result => score >= result.minScore && score <= result.maxScore) || results[0];
+    }
+     
+    userResult = getResult(testScore, answerType);
+    console.log('Selected result:', userResult);
+    
+    // 設置背景音樂和控制按鈕
+    const bgMusic = document.getElementById('background-music');
+    const musicControlBtn = document.getElementById('music-control');
+    
+    if (bgMusic && musicControlBtn) {
+        bgMusic.src = userResult.music;
+        bgMusic.load();
+        bgMusic.volume = 0.5;
+
+    // 自動播放音樂
+bgMusic.play().catch(error => {
+    console.error("自動播放音樂失敗，可能需要使用者互動：", error);
+});
+
+        
+        // 新增點擊事件監聽器
+        musicControlBtn.addEventListener('click', function() {
+            if (isMuted) {
+                bgMusic.play();
+                musicControlBtn.style.backgroundImage = "url('images/聲音icon.png')";
+                isMuted = false;
+            } else {
+                bgMusic.pause();
+                musicControlBtn.style.backgroundImage = "url('images/靜音icon.png')";
+                isMuted = true;
+            }
+        });
+    }
+    
+    // 設置使用者名稱
+    document.getElementById('userNameDisplay').textContent = `${userName} `;
+    
+    // 設置結果圖片
+    const resultImage = document.getElementById('resultImage');
+    resultImage.src = userResult.image;
+    resultImage.alt = userResult.type;
+    
+    resultImage.onload = function() {
+        console.log('圖片載入成功');
+    };
+    resultImage.onerror = function() {
+        console.error('圖片載入失敗:', userResult.image);
+    };
+    
+    // 更新結果內容
+    document.querySelector('.result-content').innerHTML = `
+        <h3>你是：${userResult.type}</h3>
+        <p>${userResult.description}</p>
+    `;
+    
+    // 將createAndDownloadVideo函數移到這裡
+    window.createAndDownloadVideo = async function() {
+        let musicPath;
+        
+        if (userResult.type === "消極型研究生") {
+            musicPath = "music/消極型.mp4";
+        } else if (userResult.type === "佛系型研究生") {
+            musicPath = "music/佛系型.mp4";
+        } else if (userResult.type === "樂觀型研究生") {
+            musicPath = "music/積極型.mp4";
+        }
+        
+        if (!musicPath) {
+            showErrorMessage('找不到對應的音樂檔案');
+            return;
+        }
+
+        try {
+            const response = await fetch(musicPath);
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${userName}的研究生音樂.mp4`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error('下載失敗:', error);
+            showErrorMessage('音樂下載失敗,請稍後再試');
+        }
+    };
+});
+
+// 截圖功能
+async function captureAndDownload() {
+    const captureArea = document.getElementById('captureArea');
+    const userName = localStorage.getItem('userName') || '訪客';
+    showLoading();
+
+    try {
+        const canvas = await html2canvas(captureArea, {
+            useCORS: true,
+            scale: 2,
+            backgroundColor: null
+        });
+
+        const link = document.createElement('a');
+        link.download = `${userName}的研究生類型分析.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    } catch (error) {
+        console.error('截圖失敗:', error);
+        showErrorMessage('截圖生成失敗,請稍後再試');
+    } finally {
+        hideLoading();
+    }
+}
+
+// Loading 控制
+function showLoading() {
+    document.getElementById('loadingOverlay').classList.add('show');
+}
+
+function hideLoading() {
+    document.getElementById('loadingOverlay').classList.remove('show');
+}
+
+// 錯誤提示
+function showErrorMessage(message) {
+    const errorElement = document.createElement('div');
+    errorElement.className = 'error-message';
+    errorElement.textContent = message;
+    document.body.appendChild(errorElement);
+    setTimeout(() => {
+        document.body.removeChild(errorElement);
+    }, 3000);
+}
+
+// 回首頁
+function goHome() {
+    window.location.href = 'index.html';
+}
+
+// 重置測驗
+function resetTest() {
+    localStorage.removeItem('testScore');
+    localStorage.removeItem('answerType');
+    localStorage.removeItem('page3Value');
+    localStorage.removeItem('page4Value');
+}
+        </script>
+    <!-- <script src="music-controller.js"></script> -->
+</body>
+</html>

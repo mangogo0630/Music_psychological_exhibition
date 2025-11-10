@@ -1,0 +1,245 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, html {
+  overflow-x: hidden;
+  background-color: black; 
+}
+
+.wrapper {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.content {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  overflow-x: hidden;
+  display: flex;           
+  justify-content: center; 
+  align-items: center;     
+}
+
+.section {
+  width: 100%;
+  height: 100%;
+}
+
+.content .section.hero {
+  background-image: url("images/eyes-底圖.jpg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  transform-origin: center center;
+  filter: brightness(1);
+  transition: filter 2s ease;
+}
+
+.section.hero.dark {
+  filter: brightness(0);
+}
+
+.image-container {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  perspective: 1000px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2;
+  opacity: 100%;
+}
+
+.background-image, 
+.foreground-image {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: contain; 
+  top: 0;
+  left: 0;
+  transform-origin: center center;
+}
+
+/* ensure foreground stays centered within container across sizes */
+.foreground-image {
+  inset: 0;               /* top/right/bottom/left = 0 */
+  margin: auto;           /* center absolutely positioned element */
+  width: auto;            /* let image size itself */
+  height: 100%;           /* fit container height */
+  max-width: 100%;
+  max-height: 100%;
+  object-position: center center;
+}
+
+#floating-button-1 {
+  position: fixed;
+  top: 15vh;
+  left: 40%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 400px;
+  background-image: url("images/eye_03.png");
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  border: none;
+  cursor: pointer;
+  display: none;
+  z-index: 10;
+  background-color: transparent;
+  color: aliceblue;
+  font-size: 48px;
+  transition: transform 0.3s ease;
+}
+
+#floating-button-2 {
+  position: fixed;
+  top: 37vh;
+  left: 60%;
+  transform: translateX(-20%);
+  width: 250px;
+  height: 400px;
+  background-image: url("images/eye_02.png");
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  border: none;
+  cursor: pointer;
+  display: none;
+  z-index: 10;
+  background-color: transparent;
+  transition: transform 0.3s ease;
+}
+
+#floating-button-3 {
+  position: fixed;
+  top: 57vh;
+  left: 38%;
+  transform: translateX(-20%);
+  width: 250px;
+  height: 400px;
+  background-image: url("images/eye_01.png");
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  border: none;
+  cursor: pointer;
+  display: none;
+  z-index: 10;
+  background-color: transparent;
+  transition: transform 0.3s ease;
+}
+
+.floating-button:hover {
+  transform: scale(1.1);
+}
+
+.floating-button:active {
+  transform: scale(0.95);
+}
+
+#music-control {
+  position: absolute;
+  bottom: 3vh;
+  left: 28%;
+  z-index: 10;
+  opacity: 0.9;
+  background-color: #313131;
+  color: #ffffff;
+  border: none;
+  padding: 10px 30px;
+  font-size: 12px;
+  border-radius: 30px;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+#music-control:hover {
+  background-color: #8e8e8e;
+  transform: scale(1.05);
+}
+
+#music-control:active {
+  background-color: #ffaa00;
+  transform: scale(0.98);
+}
+
+#music-control.playing {
+  background-color: #4a4a4a;
+}
+
+#switchImage {
+  transition: transform 0.2s ease;
+}
+
+#switchImage:hover {
+  cursor: pointer;
+  transform: scale(1.02);
+}
+
+/* mobile: stabilize viewport height to reduce jumping */
+@media screen and (max-width: 768px) {
+  .wrapper,
+  .content,
+  .section.hero,
+  .image-container {
+    height: 100dvh;
+  }
+
+  /* 縮小 floating buttons */
+  #floating-button-1 {
+    width: 150px;
+    height: 300px;
+    top: 15vh;
+  }
+
+  #floating-button-2 {
+    width: 187.5px;
+    height: 300px;
+    top: 35vh;
+  }
+
+  #floating-button-3 {
+    width: 187.5px;
+    height: 300px;
+  }
+}
+
+/* 更小的螢幕尺寸 */
+@media screen and (max-width: 480px) {
+  #floating-button-1 {
+    width: 120px;
+    height: 240px;
+    top: 25vh;
+  }
+
+  #floating-button-2 {
+    width: 150px;
+    height: 240px;
+    top: 40vh;
+  }
+
+  #floating-button-3 {
+    width: 150px;
+    height: 240px;
+  }
+}

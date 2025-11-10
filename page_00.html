@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@900&display=swap">
+    <title>論文寫作測驗</title>
+    <script src="preload-manager.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Noto Serif TC', Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #000000;
+            min-height: 100vh;
+        }
+
+        .main-container {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            transition: opacity 1s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .main-container.fade-in {
+            opacity: 1;
+        }
+
+        .background-container {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .background-image {
+            height: 100vh;
+            width: auto;
+            object-fit: contain;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+
+        .fade-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: black;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 1s ease;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .fade-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .content-container {
+            width: 40%;
+            position: relative;
+            z-index: 2;
+        }
+
+        .question-wrapper {
+            width: 100%;
+            position: relative;
+            opacity: 1;
+            transition: opacity 1s ease;
+        }
+
+        .question-wrapper.fade-out {
+            opacity: 0;
+        }
+
+        .question-image-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;  /* 新增 */
+        }
+
+        .question-image-container img {
+    width: 100%;          /* 圖片填滿容器 */
+    height: auto;
+    display: block;
+}
+
+        
+
+        .question-wrapper img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .next-button {
+            position: absolute;
+    width: 50%;         /* 改為百分比 */
+    right: -20%;        /* 調整右側位置 */
+    bottom: -20%;       /* 調整底部位置 */
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 3;
+    transition: opacity 1s ease;
+        }
+
+        .next-button img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .answers-container {
+            width: 100%;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 1s ease, visibility 1s ease;
+        }
+
+        .answers-container.fade-in {
+            display: flex;        /* 顯示時改為 flex */
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .answer-option {
+            width: 100%;
+            min-width: 150px;
+            cursor: pointer;
+            transition: transform 0.3s ease, opacity 1s ease;
+        }
+
+        .answer-option.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .answer-option:hover {
+            transform: scale(1.05);
+        }
+
+        .answer-option img {
+            width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+        /* 響應式：平板與手機 */
+        @media screen and (max-width: 768px) {
+            .content-container {
+                width: 65%;
+            }
+            .next-button {
+                left: 66%;
+                right: auto;
+                width: clamp(180px, 52%, 220px);
+                bottom: -24%;
+            }
+            .answer-option {
+                max-width: 420px;
+            }
+            /* 穩定手機瀏覽器高度，減少跳動 */
+            .background-container { height: 100dvh; }
+            .background-image { height: 100dvh; }
+        }
+
+                /* 響應式：平板與手機 */
+                @media screen and (max-width: 500px) {
+            .content-container {
+                width: 90%;
+            }
+            .next-button {
+                left: 60%;
+                right: auto;
+
+                width: clamp(180px, 52%, 220px);
+                bottom: -20%;
+            }
+            .answer-option {
+                max-width: 420px;
+            }
+
+        }
+
+
+        /* 響應式：小手機 */
+        @media screen and (max-width: 390px) {
+            .content-container {
+                width: 90%;
+            }
+            .next-button {
+                left: 60%;
+                right: auto;
+                width: clamp(160px, 56%, 200px);
+                bottom: -20%;
+            }
+            .answer-option {
+                max-width: 340px;
+            }
+
+        }
+    </style>
+</head>
+<body>
+        <audio id="background-music" loop>
+            <source src="music/01.mp3" type="audio/mp3">
+        </audio>
+        <button id="music-control" style="display: none;"></button>
+        
+        <div class="fade-overlay"></div>
+
+    <div class="main-container">
+        <div class="background-container">
+            <img src="images/鏡子-底圖.jpg" alt="背景" class="background-image">
+            <div class="overlay"></div>
+            <div class="content-container">
+                <div class="question-wrapper">
+                    <div class="question-image-container">
+                        <img src="images/問題1.png" alt="問題1" class="question-image">
+                    </div>
+                    <button class="next-button" onclick="showAnswers()">
+                        <img src="images/next.png" alt="下一步">
+                    </button>
+                </div>
+                <div class="answers-container">
+                    <div class="answer-option" onclick="selectAnswer('optimistic', this)">
+                        <img src="images/回答1.png" alt="回答1">
+                    </div>
+                    <div class="answer-option" onclick="selectAnswer('zen', this)">
+                        <img src="images/回答2.png" alt="回答2">
+                    </div>
+                    <div class="answer-option" onclick="selectAnswer('pessimistic', this)">
+                        <img src="images/回答3.png" alt="回答3">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // 頁面載入時的初始化
+document.addEventListener('DOMContentLoaded', function() {
+    // 測驗相關初始化
+    localStorage.setItem('testScore', '0');
+    // localStorage.removeItem('answerType');
+    
+    // 頁面淡入效果
+    setTimeout(() => {
+        const mainContainer = document.querySelector('.main-container');
+        mainContainer.classList.add('fade-in');
+    }, 100);
+
+    // 音樂相關初始化
+    const audio = document.getElementById("background-music");
+    const musicControlButton = document.getElementById('music-control');
+    let isPlaying = false;
+
+    // 檢查前一頁的音樂狀態
+    const musicTime = localStorage.getItem('musicTime');
+    const musicIsPlaying = localStorage.getItem('musicIsPlaying') === 'true';
+    
+    if (musicTime) {
+        audio.currentTime = parseFloat(musicTime);
+    }
+    
+    if (musicIsPlaying) {
+        audio.play().then(() => {
+            isPlaying = true;
+        }).catch(error => {
+            console.error("音樂播放失敗:", error);
+        });
+    }
+
+    // 定期保存音樂時間
+    setInterval(() => {
+        if (!audio.paused) {
+            localStorage.setItem('musicTime', audio.currentTime);
+        }
+    }, 1000);
+
+    // 頁面離開前保存音樂狀態
+    window.addEventListener('beforeunload', () => {
+        localStorage.setItem('musicTime', audio.currentTime);
+        localStorage.setItem('musicIsPlaying', !audio.paused);
+    });
+});
+
+// 顯示答案選項的功能
+function showAnswers() {
+    const questionWrapper = document.querySelector('.question-wrapper');
+    const answersContainer = document.querySelector('.answers-container');
+
+    questionWrapper.classList.add('fade-out');
+
+    setTimeout(() => {
+        questionWrapper.style.display = 'none';
+        answersContainer.style.display = 'flex';
+        
+        setTimeout(() => {
+            answersContainer.classList.add('fade-in');
+        }, 50);
+    }, 1000);
+}
+
+// 選擇答案的功能
+function selectAnswer(type, element) {
+    // 計算分數
+    let score;
+    switch(type) {
+        case 'optimistic':
+            score = 3;
+            break;
+        case 'zen':
+            score = 2;
+            break;
+        case 'pessimistic':
+            score = 1;
+            break;
+    }
+    
+    // 儲存答案和分數
+    localStorage.setItem('testScore', score);
+    // localStorage.setItem('answerType', type);
+
+    // 淡出動畫效果
+    const allOptions = document.querySelectorAll('.answer-option');
+    const fadeOverlay = document.querySelector('.fade-overlay');
+
+    allOptions.forEach(option => {
+        if (option !== element) {
+            option.classList.add('fade-out');
+        }
+    });
+
+    // 延遲切換頁面
+    setTimeout(() => {
+        element.classList.add('fade-out');
+        fadeOverlay.classList.add('active');
+        
+        setTimeout(() => {
+            window.location.href = 'page_01.html';
+        }, 2000);
+    }, 500);
+}
+    </script>
+</body>
+</html>

@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@900&display=swap">
+    <title>咖啡廳</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Noto Serif TC', Arial, sans-serif;
+            background-color: #000000;
+            min-height: 100vh;
+        }
+
+        .main-container {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .main-container.fade-in {
+            opacity: 1;
+        }
+
+        .background-container {
+            height: 100vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .question-background {
+            height: 100vh;
+            width: auto;
+            object-fit: contain;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transition: opacity 1s ease;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1;
+            transition: opacity 1s ease;
+        }
+
+        .content-container {
+            width: 40%;
+            position: relative;
+            z-index: 2;
+        }
+
+        @media screen and (min-width: 1024px) {
+            .content-container {
+                width: 25%;
+            }
+            
+            .next-button {
+                width: 40%;
+                right: -15%;
+                bottom: -15%;
+            }
+        }
+
+        .question-wrapper {
+            width: 100%;
+            position: relative;
+            opacity: 1;
+            transition: opacity 1s ease;
+        }
+
+        .question-wrapper.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .question-image-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .question-image-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .next-button {
+            position: absolute;
+            width: 50%;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            z-index: 3;
+            right: -20%;
+            bottom: -30%;
+            transform-origin: center center; /* 設定變形的原點在中心 */
+        }
+        .next-button:hover {
+            transform: scale(1.1); /* hover 時放大到 1.1 倍 */
+        }
+
+        .next-button img {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: transform 0.2s ease;
+            transform-origin: center center; /* 設定變形的原點在中心 */
+        }
+
+        .next-button:hover img {
+            transform: scale(1.1); /* hover時只縮放圖片 */
+        }
+        
+        @media screen and (min-width: 1024px) {
+            .next-button {
+                width: 40%;
+                right: -15%;
+                bottom: -20%;
+            }
+        }
+
+        .game-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 1.5s ease;
+            z-index: -1;
+        }
+
+        .game-container.show {
+            opacity: 1;
+            visibility: visible;
+            z-index: 10;
+        }
+
+        .fade-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: black;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 1s ease;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .fade-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .preload-container {
+            position: absolute;
+            width: 0;
+            height: 0;
+            overflow: hidden;
+            z-index: -1;
+        }
+        /* 修改背景相關的 z-index */
+.background-image {
+    z-index: 1;
+}
+
+.overlay-background-1,
+.overlay-background-2,
+.overlay-background-3 {
+    z-index: 1;
+}
+
+/* 確保按鈕和互動元素在最上層 */
+.fixed-image {
+    z-index: 100 !important;
+}
+
+.control-buttons {
+    z-index: 100 !important;
+}
+
+        /* 響應式（參考 page_00）：平板與手機置中下一步按鈕與穩定高度 */
+        @media screen and (max-width: 768px) {
+            .content-container {
+                width: 80%;
+            }
+            .next-button {
+                left: 60%;
+                right: auto;
+                width: clamp(180px, 52%, 220px);
+                bottom: -42%;
+            }
+            .background-container,
+            .game-container {
+                height: 100dvh;
+            }
+            
+        .question-image-container img {
+            width: 70%;
+            height: auto;
+            display: block;
+        }
+        }
+
+        /* 小手機：再縮放置中 */
+        @media screen and (max-width: 390px) {
+            .content-container {
+                width: 100%;
+            }
+            .next-button {
+                left: 56%;
+                right: auto;
+                width: clamp(160px, 56%, 200px);
+                bottom: -52%;
+            }
+
+            @media screen and (max-width: 250px) {
+            .content-container {
+                width: 120%;
+            }
+            .next-button {
+                left: 60%;
+                right: auto;
+                width: 40%;
+                bottom: -40%;
+            }
+        }
+    }
+    </style>
+    <link rel="stylesheet" href="page_02_style.css">
+</head>
+<body>
+    <audio id="background-music" loop>
+        <source src="music/music.mp3" type="audio/mp3">
+    </audio>
+    <button id="music-control" style="display: none;"></button>
+
+    <div class="fade-overlay"></div>
+
+    <div class="preload-container">
+        <img src="images/背景.png" alt="preload">
+        <img src="images/題目.png" alt="preload">
+        <img src="images/coffee_bg.png" alt="preload">
+        <img src="images/coffee_bg_2.png" alt="preload">
+        <img src="images/coffee_bg_1.png" alt="preload">
+        <img src="images/coffee_bg_3.png" alt="preload">
+    </div>
+
+    <div class="main-container">
+        <div class="background-container">
+            <img src="images/背景.png" alt="背景" class="question-background">
+            <div class="overlay"></div>
+            
+            <div class="content-container">
+                <div class="question-wrapper">
+                    <div class="question-image-container">
+                        <img src="images/題目.png" alt="問題2" class="question-image">
+                    </div>
+                    <button class="next-button" onclick="showGameContent()">
+                        <img src="images/next.png" alt="下一步">
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-container" id="gameContainer">
+            <div class="background-image"></div>
+            <div class="overlay-background-1"></div>
+            <div class="overlay-background-2"></div>
+            <div class="overlay-background-3"></div>
+        </div>
+    </div>
+
+    <script>
+        // 預載入 page_02_script.js
+        let originalInitFunction;
+        
+        function loadGameScript() {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = 'page_02_script.js';
+                script.onload = resolve;
+                script.onerror = reject;
+                document.body.appendChild(script);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            setTimeout(() => {
+                const mainContainer = document.querySelector('.main-container');
+                mainContainer.classList.add('fade-in');
+            }, 100);
+
+            // 立即載入遊戲腳本但不執行
+            await loadGameScript();
+            
+            initializeAudio();
+            preloadImages();
+        });
+
+        function initializeAudio() {
+            const audio = document.getElementById("background-music");
+            const musicTime = localStorage.getItem('musicTime');
+            const musicIsPlaying = localStorage.getItem('musicIsPlaying') === 'true';
+            
+            if (musicTime) {
+                audio.currentTime = parseFloat(musicTime);
+            }
+            
+            if (musicIsPlaying) {
+                audio.play().catch(error => {
+                    console.error("音樂播放失敗:", error);
+                });
+            }
+
+            setInterval(() => {
+                if (!audio.paused) {
+                    localStorage.setItem('musicTime', audio.currentTime);
+                    localStorage.setItem('musicIsPlaying', 'true');
+                } else {
+                    localStorage.setItem('musicIsPlaying', 'false');
+                }
+            }, 1000);
+        }
+
+        async function showGameContent() {
+            const questionWrapper = document.querySelector('.question-wrapper');
+            const fadeOverlay = document.querySelector('.fade-overlay');
+            const gameContainer = document.getElementById('gameContainer');
+            const mainBackground = document.querySelector('.question-background');
+            const overlay = document.querySelector('.overlay');
+
+            questionWrapper.classList.add('fade-out');
+            mainBackground.style.opacity = '0';
+            overlay.style.opacity = '0';
+            
+            setTimeout(() => {
+                fadeOverlay.classList.add('active');
+                
+                setTimeout(() => {
+                    // 顯示遊戲容器
+                    gameContainer.classList.add('show');
+                    
+                    // 初始化遊戲背景
+                    const backgroundImage = gameContainer.querySelector('.background-image');
+                    if (backgroundImage) {
+                        backgroundImage.classList.add('brightness');
+                    }
+
+                    // 重新觸發初始化腳本
+                    window.dispatchEvent(new Event('DOMContentLoaded'));
+                    
+                    setTimeout(() => {
+                        fadeOverlay.classList.remove('active');
+                    }, 800);
+                }, 500);
+            }, 500);
+        }
+
+        function preloadImages() {
+            const images = [
+                'images/背景.png',
+                'images/題目.png',
+                'images/next.png',
+                'images/coffee_bg.png',
+                'images/coffee_bg_2.png',
+                'images/coffee_bg_1.png',
+                'images/coffee_bg_3.png',
+                'images/m01.png',
+                'images/m02.png',
+                'images/m03.png',
+                'images/確定按鈕.png',
+                'images/重置按鈕.png',
+                'images/下一頁按鈕.png'
+            ];
+            
+            return Promise.all(images.map(src => {
+                return new Promise((resolve, reject) => {
+                    const img = new Image();
+                    img.onload = () => resolve(img);
+                    img.onerror = reject;
+                    img.src = src;
+                });
+            }));
+        }
+    </script>
+</body>
+</html>

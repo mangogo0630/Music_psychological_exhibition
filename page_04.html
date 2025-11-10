@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page 04</title>
+    <script src="preload-manager.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@900&display=swap">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Noto Serif TC', Arial, sans-serif;
+            background-color: #000000;
+            min-height: 100vh;
+        }
+
+        .main-container {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            transition: opacity 2s ease;
+        }
+
+        .main-container.fade-in {
+            opacity: 1;
+        }
+
+        .background-container {
+            height: 100vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .background-image {
+            height: 100vh;
+            width: auto;
+            object-fit: contain;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transition: opacity 0.5s ease;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1;
+            transition: background-color 1s ease;
+        }
+
+        .content-container {
+            width: 35%;
+            position: relative;
+            z-index: 2;
+        }
+
+        @media screen and (min-width: 1024px) {
+            .content-container {
+                width: 23%;
+            }
+            
+            .next-button {
+                width: 35%;
+                right: -15%;
+                bottom: -15%;
+            }
+        }
+
+        .question-wrapper {
+            width: 100%;
+            position: relative;
+            opacity: 1;
+            transition: opacity 1s ease;
+        }
+
+        .question-wrapper.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .question-image-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .question-image-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .next-button {
+            position: absolute;
+            width: 50%;
+            right: -20%;
+            bottom: -40%;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            z-index: 3;
+            transition: opacity 1s ease;
+        }
+
+        .next-button img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .interaction-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 3;
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 1.5s ease, visibility 0s linear 1.5s;
+        }
+
+        .interaction-container.show {
+            visibility: visible;
+            opacity: 1;
+            transition: opacity 1.5s ease, visibility 0s;
+        }
+
+        .content-fade-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: black;
+            opacity: 1;
+            transition: opacity 1.2s ease;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .content-fade-overlay.fade-out {
+            opacity: 0;
+        }
+
+        .slider-section {
+            position: absolute;
+            left: 50%;
+            top: 56%;
+            transform: translate(-50%, -50%);
+            width: 20%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .slider-container {
+            width: 100%;
+            position: relative;
+            margin-bottom: 40px;
+        }
+
+        .slider {
+            width: 100%;
+            height: 2px;
+            -webkit-appearance: none;
+            background: #000000;
+            outline: none;
+            position: relative;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 40px;
+            height: 60px;
+            background-image: url('images/羽毛.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-color: transparent;
+            cursor: pointer;
+            border: none;
+            margin-top: -30px;
+        }
+
+        .percentage {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            transform: translateX(-50%);
+            color: #000000;
+            font-size: 16px;
+            font-weight: 900;
+            pointer-events: none;
+        }
+
+        .next-btn {
+            width: 250px;
+            height: 75px;
+            background-image: url('images/確定按鈕_2.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            border: none;
+            background-color: transparent;
+            cursor: not-allowed;
+            transition: all 0.3s ease;
+            opacity: 0.5;
+            position: absolute;
+            left: 60%;
+            top: 60%;
+            transform: translate(-50%, -50%);
+        }
+
+        .next-btn.active {
+            cursor: pointer;
+            opacity: 1;
+            transition: transform 0.3s ease;
+        }
+
+        .next-btn.active:hover {
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        .fade-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: black;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 1s ease;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .fade-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        @media (max-width: 950px) {
+            .slider-section {
+                width: 40%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .slider-section {
+                width: 60%;
+            }
+        }
+
+        .preload-container {
+            position: absolute;
+            width: 0;
+            height: 0;
+            overflow: hidden;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+    <audio id="background-music" loop>
+        <source src="music/music.mp3" type="audio/mp3">
+    </audio>
+    <button id="music-control" style="display: none;"></button>
+
+    <div class="fade-overlay"></div>
+
+    <div class="preload-container">
+        <img src="images/進度條_bg.png" alt="preload">
+        <img src="images/羽毛.png" alt="preload">
+        <img src="images/確定按鈕_2.png" alt="preload">
+    </div>
+
+    <div class="main-container">
+        <div class="background-container">
+            <img src="images/背景 (1).png" alt="背景" class="background-image">
+            <div class="overlay"></div>
+            
+            <div class="content-container">
+                <div class="question-wrapper">
+                    <div class="question-image-container">
+                        <img src="images/題目 (1).png" alt="問題1" class="question-image">
+                    </div>
+                    <button class="next-button" onclick="showInteractionContent()">
+                        <img src="images/next.png" alt="下一步">
+                    </button>
+                </div>
+            </div>
+
+            <div class="interaction-container" id="interactionContainer">
+                <div class="content-fade-overlay" id="contentFadeOverlay"></div>
+                <div class="slider-section">
+                    <div class="slider-container">
+                        <input type="range" min="0" max="100" value="0" class="slider" id="mySlider">
+                        <div class="percentage" id="percentageValue">0%</div>
+                    </div>
+                </div>
+                <!-- 將確定按鈕移到外面 -->
+                <button class="next-btn" id="nextBtn"></button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let hasInteracted = false;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                const mainContainer = document.querySelector('.main-container');
+                mainContainer.classList.add('fade-in');
+            }, 100);
+
+            initializeAudio();
+            preloadImages();
+            initializeSlider();
+        });
+
+        function initializeAudio() {
+            const audio = document.getElementById("background-music");
+            const musicTime = localStorage.getItem('musicTime');
+            const musicIsPlaying = localStorage.getItem('musicIsPlaying') === 'true';
+            
+            if (musicTime) {
+                audio.currentTime = parseFloat(musicTime);
+            }
+            
+            if (musicIsPlaying) {
+                audio.play().catch(error => {
+                    console.error("音樂播放失敗:", error);
+                });
+            }
+
+            setInterval(() => {
+                if (!audio.paused) {
+                    localStorage.setItem('musicTime', audio.currentTime);
+                    localStorage.setItem('musicIsPlaying', 'true');
+                } else {
+                    localStorage.setItem('musicIsPlaying', 'false');
+                }
+            }, 1000);
+        }
+
+        function showInteractionContent() {
+            const questionWrapper = document.querySelector('.question-wrapper');
+            const fadeOverlay = document.querySelector('.fade-overlay');
+            const interactionContainer = document.getElementById('interactionContainer');
+            const overlay = document.querySelector('.overlay');
+            const backgroundImage = document.querySelector('.background-image');
+
+            questionWrapper.classList.add('fade-out');
+            
+            setTimeout(() => {
+                fadeOverlay.classList.add('active');
+                
+                setTimeout(() => {
+                    overlay.style.backgroundColor = 'rgba(0, 0, 0, 0)';
+                    backgroundImage.src = 'images/進度條_bg.png';
+                    interactionContainer.classList.add('show');
+
+                    setTimeout(() => {
+                        fadeOverlay.classList.remove('active');
+                        
+                        setTimeout(() => {
+                            document.getElementById('contentFadeOverlay').classList.add('fade-out');
+                        }, 500);
+                    }, 1500);
+                }, 1000);
+            }, 1000);
+        }
+
+        function initializeSlider() {
+            const slider = document.getElementById('mySlider');
+            const percentageValue = document.getElementById('percentageValue');
+            const nextBtn = document.getElementById('nextBtn');
+
+            function updatePercentage(value) {
+                const percent = value + '%';
+                percentageValue.textContent = percent;
+                const sliderWidth = slider.offsetWidth;
+                const position = (value / 100) * sliderWidth;
+                percentageValue.style.left = `${position}px`;
+                
+                if (!hasInteracted && value > 0) {
+                    hasInteracted = true;
+                    nextBtn.classList.add('active');
+                }
+            }
+
+            slider.addEventListener('input', function() {
+                updatePercentage(this.value);
+            });
+
+            nextBtn.addEventListener('click', function() {
+                if (!hasInteracted) {
+                    alert('請移動滑桿選擇完成度');
+                    return;
+                }
+                
+                let currentScore = parseFloat(localStorage.getItem('testScore')) || 0;
+                const currentValue = parseInt(slider.value);
+                
+                if (currentValue <= 40) {
+                    currentScore += 1;
+                } else if (currentValue <= 80) {
+                    currentScore += 2;
+                } else {
+                    currentScore += 3;
+                }
+                
+                localStorage.setItem('testScore', currentScore.toString());
+                // localStorage.setItem('page4Value', currentValue);
+                
+                const fadeOverlay = document.querySelector('.fade-overlay');
+                fadeOverlay.classList.add('active');
+                
+                setTimeout(() => {
+                    window.location.href = 'result.html';
+                }, 1000);
+            });
+        }
+
+        function preloadImages() {
+            const images = [
+                'images/進度條_bg.png',
+                'images/羽毛.png',
+                'images/確定按鈕_2.png',
+                'images/next.png',
+                'images/背景 (1).png'
+            ];
+            
+            return Promise.all(images.map(src => {
+                return new Promise((resolve, reject) => {
+                    const img = new Image();
+                    img.onload = () => resolve(img);
+                    img.onerror = reject;
+                    img.src = src;
+                });
+            })).then(() => {
+                console.log('所有圖片預加載完成');
+            }).catch(error => {
+                console.error('圖片預加載失敗:', error);
+            });
+        }
+    </script>
+</body>
+</html>

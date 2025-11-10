@@ -1,0 +1,287 @@
+/* http://meyerweb.com/eric/tools/css/reset/ 
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+	display: block;
+}
+body {
+	line-height: 1;
+}
+ol, ul {
+	list-style: none;
+}
+blockquote, q {
+	quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+
+/* 背景 */
+/* 页面初始背景为黑色 */
+/* 預設樣式 */
+/* 頁面基本樣式 */
+body {
+    margin: 0;
+    height: 100vh;
+    width: 100vw;
+    background: black;
+    overflow: hidden;
+    position: relative;
+}
+
+/* 初始背景 */
+.background-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("images/coffee_bg.png");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: auto 100vh;
+    opacity: 0;
+    transition: opacity 3s ease-in;
+}
+
+/* 新的背景 */
+.overlay-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("images/coffee_bg_2.png");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: auto 100vh;;
+    opacity: 0;
+    transition: opacity 2s ease-in;
+}
+
+/* 背景圖片完全顯示 */
+.background-image.brightness {
+    opacity: 1;
+}
+
+/* 新背景慢慢出現 */
+.overlay-background.visible {
+    opacity: 1;
+}
+
+/* 進度條樣式 */
+.progress-bar {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20%;
+    height: 20px;
+    background-color: #ccc;
+    border-radius: 10px;
+    overflow: hidden;
+    display: none;
+    opacity: 0.5;
+}
+
+.progress-bar.active {
+    display: block;
+}
+
+.progress-fill {
+    width: 0%;
+    height: 100%;
+    background-color: #4caf50;
+    transition: width 0.3s ease-in-out;
+}
+
+/* 圖片按鈕初始透明度為0，逐漸顯示 */
+.fixed-image {
+    position: absolute;
+    width: 150px !important;
+    height: auto;
+    cursor: pointer;
+    opacity: 0;
+    transition: all 0.3s ease;
+    transform: translate(-50%, -50%);
+}
+
+.fixed-image.visible {
+    opacity: 1; /* 顯示圖片 */
+}
+
+.fixed-image:hover {
+    transform: scale(1.1); /* 滑過時放大 */
+}
+
+/* 新增三個不同的背景 */
+.overlay-background-1,
+.overlay-background-2,
+.overlay-background-3 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: auto 100vh;
+    opacity: 0;
+    transition: opacity 2s ease-in;
+}
+
+.overlay-background-1 {
+    background-image: url("images/coffee_bg_1.png");
+}
+
+.overlay-background-2 {
+    background-image: url("images/coffee_bg_2.png");
+}
+
+.overlay-background-3 {
+    background-image: url("images/coffee_bg_3.png");
+}
+
+.overlay-background-1.visible,
+.overlay-background-2.visible,
+.overlay-background-3.visible {
+    opacity: 1;
+}
+
+/* 控制按鈕容器 */
+.control-buttons {
+    position: fixed;
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 40px; /* 按鈕之間的間距 */
+    z-index: 1000;
+}
+
+/* 控制按鈕樣式 */
+.control-button {
+    width: 100px; /* 調整按鈕大小 */
+    height: auto;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.control-button:hover {
+    transform: scale(1.1);
+}
+
+/* 選中狀態的按鈕樣式 */
+.fixed-image.selected {
+    transform: scale(1.2);
+    border: 3px solid #fff; /* 白色邊框 */
+    box-shadow: 0 0 10px rgba(255,255,255,0.5); /* 發光效果 */
+}
+.fixed-image.clicked {
+    opacity: 0.2;
+}
+
+/* ===== 響應式節點（占位，未更動數值） ===== */
+@media screen and (max-width: 1024px) {
+    /* 預留：平板橫向 */
+}
+
+@media screen and (max-width: 768px) {
+    /* 預留：一般手機 */
+}
+
+@media screen and (max-width: 500px) {
+    /* 預留：小尺寸手機 */
+}
+
+@media screen and (max-width: 390px) {
+    /* 預留：極小尺寸手機（如 iPhone mini 系列） */
+}
+
+@media screen and (orientation: landscape) and (max-height: 500px) {
+    /* 預留：手機橫向時的調整 */
+}
+
+
+/* 手機版位置 */
+@media screen and (max-width: 768px) {
+    .fixed-image {
+        position: absolute;
+        width: 130px !important;}
+    #m01 { /* 文獻好難找 */
+        top: 38%;
+        left: 50%;
+    }
+
+    #m02 { /* 老師說要改 */
+        top: 50%;
+        left: calc(50% + 110px);
+    }
+
+    #m03 { /* 我要2年畢業 */
+        top: 48%;
+        left: calc(50% - 120px);
+    }
+}
+
+/* 電腦版位置 */
+@media screen and (min-width: 769px) {
+    #m01 { /* 文獻好難找 */
+        top: 35%;
+        left: 52%;
+    }
+
+    #m02 { /* 老師說要改 */
+        top: 48%;
+        left: calc(50% + 180px); /* 從中心點往右 200px */
+    }
+
+    #m03 { /* 我要2年畢業 */
+        top: 45%;
+        left: calc(50% - 100px); /* 從中心點往左 200px */
+    }
+}
+
+.fixed-image.visible {
+    opacity: 1;
+}
+
+.fixed-image:hover {
+    transform: translate(-50%, -50%) scale(1.1);
+}
+
+.fixed-image.clicked {
+    opacity: 0.2;
+}
