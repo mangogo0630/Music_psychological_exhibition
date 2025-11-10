@@ -8,6 +8,7 @@ const musicControlButton = document.getElementById('music-control');
 const imgElement = document.getElementById("switchImage");
 let isPlaying = false;
 let isLastImage = false;
+const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
 // 當 DOM 加載完成後初始化
 window.addEventListener("DOMContentLoaded", () => {
@@ -125,6 +126,9 @@ function initScrollEffects() {
 
     // 禁用滾動
     document.body.style.overflow = 'hidden';
+    // 避免手機彈性滾動造成視覺回彈
+    document.documentElement.style.overscrollBehaviorY = 'none';
+    document.body.style.touchAction = 'none';
     
     // 設置滾動事件監聽器
     window.addEventListener('wheel', handleScroll, { passive: false });
@@ -152,7 +156,7 @@ function handleScroll(e) {
             hint.style.backgroundColor = 'rgba(0,0,0,0.7)';
             hint.style.borderRadius = '5px';
             hint.style.zIndex = '1000';
-            hint.textContent = '嘗試擊碎鏡子';
+            hint.textContent = isTouchDevice ? '用手指向下滑，嘗試擊碎鏡子' : '滾動滑鼠，嘗試擊碎鏡子';
             document.body.appendChild(hint);
             
             setTimeout(() => {
@@ -172,7 +176,10 @@ function initFloatingButton(buttonId, startPosition, yOffset, duration) {
             gsap.to(buttonId, { opacity: 1, duration: 1, display: "block" });
         },
         onLeaveBack: () => {
-            gsap.to(buttonId, { opacity: 0, duration: 1 });
+            // 完成後（最後一張圖出現）不再隱藏，避免手機回彈把選項藏起來
+            if (!isLastImage) {
+                gsap.to(buttonId, { opacity: 0, duration: 1 });
+            }
         }
     });
 
@@ -209,9 +216,19 @@ function initClickableImage() {
                 
                 if (currentIndex === images.length - 1) {
                     isLastImage = true;
+                    // 解除鎖定與回彈抑制
                     document.body.style.overflow = 'auto';
+                    document.documentElement.style.overscrollBehaviorY = '';
+                    document.body.style.touchAction = '';
                     window.removeEventListener('wheel', handleScroll);
                     window.removeEventListener('touchmove', handleScroll);
+                    // 小幅度自動滾動，讓手機不會因為彈回導致顯示狀態錯亂
+                    setTimeout(() => {
+                        window.scrollTo({ top: 1, behavior: 'smooth' });
+                        if (ScrollTrigger && ScrollTrigger.refresh) {
+                            ScrollTrigger.refresh();
+                        }
+                    }, 50);
                     
                     const scrollPrompt = document.createElement('div');
                     scrollPrompt.id = 'scrollPrompt';
@@ -224,7 +241,7 @@ function initClickableImage() {
                     scrollPrompt.style.backgroundColor = 'rgba(0,0,0,0.7)';
                     scrollPrompt.style.borderRadius = '5px';
                     scrollPrompt.style.zIndex = '2000';
-                    scrollPrompt.textContent = '滾動滑鼠，進入鏡子內部';
+                    scrollPrompt.textContent = isTouchDevice ? '手指向下滑，進入鏡子內部' : '滾動滑鼠，進入鏡子內部';
                     document.body.appendChild(scrollPrompt);
                     
                     setTimeout(() => {
