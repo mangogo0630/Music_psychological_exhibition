@@ -331,9 +331,21 @@
             }
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 680px) {
             .slider-section {
                 width: 60%;
+            }
+            /* 手機版：縮小滑桿按鈕和確定鍵 */
+            .slider::-webkit-slider-thumb {
+                width: 30px;
+                height: 45px;
+                margin-top: -22.5px;
+            }
+            .next-btn {
+                width: 180px;
+                height: 54px;
+                left: 75%;
+                top: 59%;
             }
         }
 
