@@ -87,6 +87,66 @@
             }
         }
 
+        /* 響應式：平板與手機 */
+        @media screen and (max-width: 768px) {
+            html, body {
+                height: 100dvh;
+            }
+            .main-container {
+                height: 100dvh;
+            }
+            .content-container {
+                width: 65%;
+            }
+            .next-button {
+                left: 66%;
+                right: auto;
+                width: clamp(180px, 52%, 220px);
+                bottom: -24%;
+            }
+            /* 穩定手機瀏覽器高度，減少跳動 */
+            .background-container { height: 100dvh; }
+            .background-image { height: 100dvh; }
+        }
+
+        /* 響應式：平板與手機 */
+        @media screen and (max-width: 500px) {
+            html, body {
+                height: 100dvh;
+            }
+            .main-container {
+                height: 100dvh;
+            }
+            .content-container {
+                width: 90%;
+            }
+            .next-button {
+                left: 60%;
+                right: auto;
+                width: clamp(180px, 52%, 220px);
+                bottom: -20%;
+            }
+        }
+
+        /* 響應式：小手機 */
+        @media screen and (max-width: 390px) {
+            html, body {
+                height: 100dvh;
+            }
+            .main-container {
+                height: 100dvh;
+            }
+            .content-container {
+                width: 90%;
+            }
+            .next-button {
+                left: 60%;
+                right: auto;
+                width: clamp(160px, 56%, 200px);
+                bottom: -20%;
+            }
+        }
+
         .question-wrapper {
             width: 100%;
             position: relative;
