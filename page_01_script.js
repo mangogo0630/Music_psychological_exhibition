@@ -8,8 +8,9 @@ const musicControlButton = document.getElementById('music-control');
 const imgElement = document.getElementById("switchImage");
 let isPlaying = false;
 let isLastImage = false;
-const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-let scrollProgress = 0; // 全局變量追蹤滾動進度
+let isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+let lastScrollTop = 0;
+let touchStartY = 0;
 
 // 當 DOM 加載完成後初始化
 window.addEventListener("DOMContentLoaded", () => {
@@ -127,9 +128,6 @@ function initScrollEffects() {
 
     // 禁用滾動
     document.body.style.overflow = 'hidden';
-    // 避免手機彈性滾動造成視覺回彈
-    document.documentElement.style.overscrollBehaviorY = 'none';
-    document.body.style.touchAction = 'none';
     
     // 設置滾動事件監聽器
     window.addEventListener('wheel', handleScroll, { passive: false });
@@ -139,56 +137,6 @@ function initScrollEffects() {
     initFloatingButton("#floating-button-1", "bottom 50%", -10, 1.5);
     initFloatingButton("#floating-button-2", "bottom 25%", -8, 1.8);
     initFloatingButton("#floating-button-3", "bottom 30%", -7, 1.0);
-
-    // 若在最上面，按鈕全部隱藏（避免初始或回頂時露出）
-    const scrollProgressTrigger = ScrollTrigger.create({
-        trigger: ".wrapper",
-        start: "top top",
-        end: "+=100%",
-        onUpdate: (self) => {
-            scrollProgress = self.progress;
-            // 頂端時（progress <= 0.05）強制隱藏所有按鈕
-            // 非頂端時，如果 isLastImage 為 false，需要 progress > 0.05 才顯示
-            // 如果 isLastImage 為 true，可以顯示（但頂端時仍隱藏）
-            const isAtTop = self.progress <= 0.05;
-            const shouldShow = !isAtTop && (isLastImage || self.progress > 0.05);
-            
-            const buttons = document.querySelectorAll(".floating-button");
-            buttons.forEach(btn => {
-                if (shouldShow) {
-                    // 顯示但不搶動畫控制
-                    if (getComputedStyle(btn).display === 'none') {
-                        btn.style.display = 'block';
-                        btn.style.visibility = 'visible';
-                    }
-                } else {
-                    // 強制隱藏：頂端時必須隱藏
-                    btn.style.opacity = '0';
-                    btn.style.display = 'none';
-                    btn.style.visibility = 'hidden';
-                }
-            });
-        }
-    });
-
-    // 當 isLastImage 為 true 後，監聽實際滾動位置（因為此時滾動已解鎖）
-    const checkScrollPosition = () => {
-        if (isLastImage) {
-            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            const isAtTop = scrollTop <= 10; // 允許 10px 的誤差
-            
-            if (isAtTop) {
-                const buttons = document.querySelectorAll(".floating-button");
-                buttons.forEach(btn => {
-                    btn.style.opacity = '0';
-                    btn.style.display = 'none';
-                    btn.style.visibility = 'hidden';
-                });
-            }
-        }
-    };
-    
-    window.addEventListener('scroll', checkScrollPosition, { passive: true });
 }
 
 // 滾動處理函數
@@ -207,7 +155,7 @@ function handleScroll(e) {
             hint.style.backgroundColor = 'rgba(0,0,0,0.7)';
             hint.style.borderRadius = '5px';
             hint.style.zIndex = '1000';
-            hint.textContent = isTouchDevice ? '點擊畫面，嘗試擊碎鏡子' : '點擊畫面，嘗試擊碎鏡子';
+            hint.textContent = '嘗試擊碎鏡子';
             document.body.appendChild(hint);
             
             setTimeout(() => {
@@ -224,27 +172,10 @@ function initFloatingButton(buttonId, startPosition, yOffset, duration) {
         start: startPosition,
         endTrigger: ".new-background",
         onEnter: () => {
-            // 只有在滾動進度足夠時才顯示按鈕
-            if (scrollProgress > 0.05 && !isLastImage) {
-                gsap.to(buttonId, { opacity: 1, duration: 1, display: "block", visibility: "visible" });
-            }
+            gsap.to(buttonId, { opacity: 1, duration: 1, display: "block" });
         },
         onLeaveBack: () => {
-            // 完成後（最後一張圖出現）不再隱藏，避免手機回彈把選項藏起來
-            // 頂端時強制隱藏
-            if (!isLastImage || scrollProgress <= 0.05) {
-                gsap.to(buttonId, { 
-                    opacity: 0, 
-                    duration: 1,
-                    onComplete: () => {
-                        const btn = document.querySelector(buttonId);
-                        if (btn) {
-                            btn.style.display = 'none';
-                            btn.style.visibility = 'hidden';
-                        }
-                    }
-                });
-            }
+            gsap.to(buttonId, { opacity: 0, duration: 1 });
         }
     });
 
@@ -281,19 +212,17 @@ function initClickableImage() {
                 
                 if (currentIndex === images.length - 1) {
                     isLastImage = true;
-                    // 解除鎖定與回彈抑制
                     document.body.style.overflow = 'auto';
-                    document.documentElement.style.overscrollBehaviorY = '';
-                    document.body.style.touchAction = '';
                     window.removeEventListener('wheel', handleScroll);
                     window.removeEventListener('touchmove', handleScroll);
-                    // 小幅度自動滾動，讓手機不會因為彈回導致顯示狀態錯亂
-                    setTimeout(() => {
-                        window.scrollTo({ top: 1, behavior: 'smooth' });
-                        if (ScrollTrigger && ScrollTrigger.refresh) {
-                            ScrollTrigger.refresh();
-                        }
-                    }, 50);
+                    
+                    // 手機版：防止往上滑動
+                    if (isMobile) {
+                        lastScrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                        window.addEventListener('touchstart', handleTouchStart, { passive: true });
+                        window.addEventListener('touchmove', handleTouchMove, { passive: false });
+                        window.addEventListener('scroll', preventScrollUp, { passive: false });
+                    }
                     
                     const scrollPrompt = document.createElement('div');
                     scrollPrompt.id = 'scrollPrompt';
@@ -306,7 +235,7 @@ function initClickableImage() {
                     scrollPrompt.style.backgroundColor = 'rgba(0,0,0,0.7)';
                     scrollPrompt.style.borderRadius = '5px';
                     scrollPrompt.style.zIndex = '2000';
-                    scrollPrompt.textContent = isTouchDevice ? '手指向下滑，進入鏡子內部' : '滾動滑鼠，進入鏡子內部';
+                    scrollPrompt.textContent = isMobile ? '手指往下滑，進入鏡子內部' : '滾動滑鼠，進入鏡子內部';
                     document.body.appendChild(scrollPrompt);
                     
                     setTimeout(() => {
@@ -378,6 +307,46 @@ function handleButtonClick(button) {
             ease: "power2.out"
         });
     }, 500);
+}
+
+// 手機版：觸摸開始
+function handleTouchStart(e) {
+    if (!isMobile || !isLastImage) return;
+    touchStartY = e.touches[0].clientY;
+}
+
+// 手機版：觸摸移動 - 防止往上滑動
+function handleTouchMove(e) {
+    if (!isMobile || !isLastImage) return;
+    
+    const touchEndY = e.touches[0].clientY;
+    const currentScrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    
+    // 如果往上滑動（touchEndY < touchStartY 表示手指往上移動）
+    if (touchEndY < touchStartY && currentScrollTop > 0) {
+        e.preventDefault();
+        return false;
+    }
+    
+    // 更新最後的滾動位置
+    lastScrollTop = currentScrollTop;
+}
+
+// 手機版：防止往上滑動（備用方案）
+function preventScrollUp(e) {
+    if (!isMobile || !isLastImage) return;
+    
+    const currentScrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    
+    // 如果嘗試往上滑動，阻止並保持在當前位置
+    if (currentScrollTop < lastScrollTop) {
+        e.preventDefault();
+        window.scrollTo(0, lastScrollTop);
+        return false;
+    }
+    
+    // 更新最後的滾動位置（只記錄往下滑動）
+    lastScrollTop = currentScrollTop <= 0 ? 0 : currentScrollTop;
 }
 
 // 離開頁面前保存音樂狀態
