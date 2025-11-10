@@ -192,6 +192,12 @@
 
         /* 響應式：平板與手機 */
         @media screen and (max-width: 768px) {
+            html, body {
+                height: 100dvh;
+            }
+            .main-container {
+                height: 100dvh;
+            }
             .content-container {
                 width: 65%;
             }
@@ -209,27 +215,37 @@
             .background-image { height: 100dvh; }
         }
 
-                /* 響應式：平板與手機 */
-                @media screen and (max-width: 500px) {
+        /* 響應式：平板與手機 */
+        @media screen and (max-width: 500px) {
+            html, body {
+                height: 100dvh;
+            }
+            .main-container {
+                height: 100dvh;
+            }
             .content-container {
                 width: 90%;
             }
             .next-button {
                 left: 60%;
                 right: auto;
-
                 width: clamp(180px, 52%, 220px);
                 bottom: -20%;
             }
             .answer-option {
                 max-width: 420px;
             }
-
         }
 
 
         /* 響應式：小手機 */
         @media screen and (max-width: 390px) {
+            html, body {
+                height: 100dvh;
+            }
+            .main-container {
+                height: 100dvh;
+            }
             .content-container {
                 width: 90%;
             }
@@ -242,7 +258,6 @@
             .answer-option {
                 max-width: 340px;
             }
-
         }
     </style>
 </head>
