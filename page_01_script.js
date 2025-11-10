@@ -167,17 +167,23 @@ function handleScroll(e) {
 
 // 浮動按鈕初始化
 function initFloatingButton(buttonId, startPosition, yOffset, duration) {
-    ScrollTrigger.create({
+    const scrollTriggerConfig = {
         trigger: ".section.hero",
         start: startPosition,
         endTrigger: ".new-background",
         onEnter: () => {
             gsap.to(buttonId, { opacity: 1, duration: 1, display: "block" });
-        },
-        onLeaveBack: () => {
-            gsap.to(buttonId, { opacity: 0, duration: 1 });
         }
-    });
+    };
+    
+    // 手機版：按鈕出現後不再消失（除了點擊後）
+    if (!isMobile) {
+        scrollTriggerConfig.onLeaveBack = () => {
+            gsap.to(buttonId, { opacity: 0, duration: 1 });
+        };
+    }
+    
+    ScrollTrigger.create(scrollTriggerConfig);
 
     gsap.to(buttonId, {
         y: yOffset,
